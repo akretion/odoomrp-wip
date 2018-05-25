@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+<record id="view_quant_package_form" model="ir.ui.view">
+    <field name="name">move_wizard.stock.quant.package.form</field>
+    <field name="model">stock.quant.package</field>
+    <field name="inherit_id" ref="stock.view_quant_package_form"/>
+    <field name="arch" type="xml">
+        <button name="unpack" position="before">
+            <button name="%(action_move_packages)d" type="action" string="Move to Another Location" groups="stock.group_stock_user"/>
+        </button>
+    </field>
+</record>
+
+</odoo>

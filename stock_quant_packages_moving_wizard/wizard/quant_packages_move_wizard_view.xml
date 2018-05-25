@@ -1,34 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<openerp>
-    <data>
-        <record id="stock_quant_package_move_wizard" model="ir.ui.view">
-            <field name="name">stock.quant.package.move.wizard.form</field>
-            <field name="model">stock.quant.package.move</field>
-            <field name="arch" type="xml">
-                <form string="Package Transfer details">
-                    <group name="main">
-                        <field name="pack_move_items" nolabel="1">
-                            <tree editable="bottom">
-                                <field name="package" />
-                                <field name="source_loc" />
-                                <field name="dest_loc"
-                                    domain="[('id', '!=', source_loc)]" />
-                            </tree>
-                        </field>
-                    </group>
-                    <footer>
-                        <button name="do_detailed_transfer"
-                            string="_Apply" type="object" class="oe_highlight" />
-                        or
-                        <button string="_Cancel" class="oe_link"
-                            special="cancel" />
-                    </footer>
-                </form>
-            </field>
-        </record>
+<odoo>
 
-        <act_window name="Move Packages" groups="stock.group_tracking_lot"
-            res_model="stock.quant.package.move" src_model="stock.quant.package"
-            view_mode="form" target="new" key2="client_action_multi" id="action_move_packages" />
-    </data>
-</openerp>
+<record id="stock_quant_package_move_wizard" model="ir.ui.view">
+    <field name="name">stock.quant.package.move.wizard.form</field>
+    <field name="model">stock.quant.package.move</field>
+    <field name="arch" type="xml">
+        <form string="Package Transfer details">
+            <group name="main">
+                <field name="dest_location_id" />
+                <field name="line_ids" nolabel="1" colspan="2">
+                    <tree editable="bottom">
+                        <field name="package_id" />
+                        <field name="src_location_id" />
+                    </tree>
+                </field>
+            </group>
+            <footer>
+                <button name="run"
+                    string="Move" type="object" class="btn-primary" />
+                or
+                <button string="Cancel" class="btn-default" special="cancel" />
+            </footer>
+        </form>
+    </field>
+</record>
+
+<act_window id="action_move_packages" name="Move Packages"
+    groups="stock.group_tracking_lot"
+    res_model="stock.quant.package.move" src_model="stock.quant.package"
+    view_mode="form" target="new" key2="client_action_multi"/>
+
+</odoo>

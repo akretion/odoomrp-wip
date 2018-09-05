@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
-from odoo import api, fields, models, _
+from odoo import api, models, _
 from odoo.exceptions import UserError
 
 
@@ -19,18 +19,12 @@ class StockQuant(models.Model):
             'location_dest_id': dest_location.id,
             'product_uom_qty': self.qty,
             'product_uom': self.product_id.uom_id.id,
-            'date_expected': fields.Datetime.now(),
-            'date': fields.Datetime.now(),
             'restrict_lot_id': self.lot_id.id or False,
             'origin': _('Quant Move'),
         }
         return vals
 
     def move_to(self, dest_location):
-        # if the quant is reserved for another move,
-        # we should cleanly un-reserve it first, so that
-        # the picking that booked this quant comes back from
-        # available to waiting availability
         if dest_location.usage == 'view':
             raise UserError(_(
                 "Cannot move to location '%s' which is a view location.")
@@ -39,8 +33,18 @@ class StockQuant(models.Model):
         for quant in self:
             if quant.location_id == dest_location:
                 continue
+            # if the quant is reserved for another move,
+            # we should cleanly un-reserve it first, so that
+            # the picking that booked this quant comes back from
+            # available to waiting availability
+            # If you have the OCA module stock_quant_merge
+            # make sure that you have the code of this PR:
+            # https://github.com/OCA/stock-logistics-warehouse/pull/475/files
+            # So that the quant is not merged with other quants right before
+            # the move!
             if quant.reservation_id:
-                quant.reservation_id.do_unreserve()
+                quant.reservation_id.with_context(
+                    disable_stock_quant_merge=True).do_unreserve()
                 if quant.reservation_id:
                     raise UserError(_(
                         "Odoo failed to unreserve the quant ID %d") % quant.id)
